@@ -154,6 +154,11 @@ jQuery.extend( {
 										// Normal processors (resolve) also hook into progress
 										} else {
 
+											// 用来决议的handler返回结果是一个thenbale对象
+											// deferred在当前状态下无法决议
+											// 以这个thenable的决议结果作为deferred的决议结果
+											// 往后如果同期及前期的handler（包括special）又被调用
+											// 则忽略
 											// ...and disregard older resolution values
 											maxDepth++;
 
@@ -368,6 +373,8 @@ jQuery.extend( {
 		if ( remaining <= 1 ) {
 			adoptValue( singleValue, master.done( updateFunc( i ) ).resolve, master.reject );
 
+			// 传入的thenable对象等待resolve的场合
+			// 传入的thenable对象已经resolve，resolve结果仍是一个thenbale对象的场合
 			// Use .then() to unwrap secondary thenables (cf. gh-3000)
 			if ( master.state() === "pending" ||
 				jQuery.isFunction( resolveValues[ i ] && resolveValues[ i ].then ) ) {
