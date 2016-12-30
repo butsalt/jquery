@@ -18,6 +18,8 @@ jQuery.extend( {
 			// Speed up dequeue by getting out quickly if this is just a lookup
 			if ( data ) {
 				if ( !queue || jQuery.isArray( data ) ) {
+					// 如果data是一个数组，makeArray会根据data复制一个新的数组
+					// 如果data不是一个数组，makeArray会生成一个新的数组，并把data压入其中
 					queue = dataPriv.access( elem, type, jQuery.makeArray( data ) );
 				} else {
 					queue.push( data );
@@ -39,6 +41,7 @@ jQuery.extend( {
 			};
 
 		// If the fx queue is dequeued, always remove the progress sentinel
+		// fn调用next时，queue的头部被压入的'inprogress'仍然存在
 		if ( fn === "inprogress" ) {
 			fn = queue.shift();
 			startLength--;
@@ -54,9 +57,11 @@ jQuery.extend( {
 
 			// Clear up the last queue stop function
 			delete hooks.stop;
+			// next给了fn权利是否继续dequeue
 			fn.call( elem, next, hooks );
 		}
 
+		// 当type对应的queue执行完毕时，从元素上卸载这个queue，再把hooks也卸载了
 		if ( !startLength && hooks ) {
 			hooks.empty.fire();
 		}
@@ -95,6 +100,7 @@ jQuery.fn.extend( {
 				// Ensure a hooks for this queue
 				jQuery._queueHooks( this, type );
 
+				// 如果当前queue还未开始dequeue，则主动启动dequeue
 				if ( type === "fx" && queue[ 0 ] !== "inprogress" ) {
 					jQuery.dequeue( this, type );
 				}
@@ -106,6 +112,7 @@ jQuery.fn.extend( {
 		} );
 	},
 	clearQueue: function( type ) {
+		// 所有元素对应type挂载一个新的空数组
 		return this.queue( type || "fx", [] );
 	},
 
@@ -118,6 +125,7 @@ jQuery.fn.extend( {
 			elements = this,
 			i = this.length,
 			resolve = function() {
+				// 为真时，说明每个元素对应的queue均已执行完毕
 				if ( !( --count ) ) {
 					defer.resolveWith( elements, [ elements ] );
 				}
@@ -131,8 +139,10 @@ jQuery.fn.extend( {
 
 		while ( i-- ) {
 			tmp = dataPriv.get( elements[ i ], type + "queueHooks" );
+			// 为真时，就是当前元素type对应的queue还在执行，需要等待queue执行完毕
 			if ( tmp && tmp.empty ) {
 				count++;
+				// 当queue执行完毕时调用resolve
 				tmp.empty.add( resolve );
 			}
 		}
