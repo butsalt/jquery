@@ -220,10 +220,14 @@ jQuery.extend( {
 			origName = jQuery.camelCase( name ),
 			style = elem.style;
 
+		// 获取origName在css中的真实名称
+		// 如果当前origName在css中的真实名称未在cssProps中找到，则通过venderPropName尝试查找
+		// 如果查找到真实名称则在cssProps进行缓存
 		name = jQuery.cssProps[ origName ] ||
 			( jQuery.cssProps[ origName ] = vendorPropName( origName ) || origName );
 
 		// Gets hook for the prefixed version, then unprefixed version
+		// 如果属性对应的get，setyou特殊需求则应该存在于jQuery.cssHooks
 		hooks = jQuery.cssHooks[ name ] || jQuery.cssHooks[ origName ];
 
 		// Check if we're setting a value
