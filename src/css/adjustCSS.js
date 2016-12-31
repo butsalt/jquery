@@ -17,6 +17,8 @@ function adjustCSS( elem, prop, valueParts, tween ) {
 				return jQuery.css( elem, prop, "" );
 			},
 		initial = currentValue(),
+		// 优先使用valueParts中的单位
+		// 否则查找jQuery.cssNumber，jQuery.cssNumber中包含的说明这个属性原本就不该有单位
 		unit = valueParts && valueParts[ 3 ] || ( jQuery.cssNumber[ prop ] ? "" : "px" ),
 
 		// Starting value computation is required for potential unit mismatches
