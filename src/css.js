@@ -227,7 +227,7 @@ jQuery.extend( {
 			( jQuery.cssProps[ origName ] = vendorPropName( origName ) || origName );
 
 		// Gets hook for the prefixed version, then unprefixed version
-		// 如果属性对应的get，setyou特殊需求则应该存在于jQuery.cssHooks
+		// 如果属性对应的get，set有特殊需求则应该存在于jQuery.cssHooks
 		hooks = jQuery.cssHooks[ name ] || jQuery.cssHooks[ origName ];
 
 		// Check if we're setting a value
@@ -281,6 +281,7 @@ jQuery.extend( {
 		}
 	},
 
+	// 如果extra为真值，则会尝试将name对应的值转化为Number
 	css: function( elem, name, extra, styles ) {
 		var val, num, hooks,
 			origName = jQuery.camelCase( name );
