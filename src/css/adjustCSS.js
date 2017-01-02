@@ -5,6 +5,7 @@ define( [
 
 "use strict";
 
+// 获取元素prop对应的值，再根据valueParts做调整
 function adjustCSS( elem, prop, valueParts, tween ) {
 	var adjusted,
 		scale = 1,
@@ -17,6 +18,7 @@ function adjustCSS( elem, prop, valueParts, tween ) {
 				return jQuery.css( elem, prop, "" );
 			},
 		initial = currentValue(),
+		// 尝试获取valueParts中使用的单位
 		// 优先使用valueParts中的单位
 		// 否则查找jQuery.cssNumber，jQuery.cssNumber中包含的说明这个属性原本就不该有单位
 		unit = valueParts && valueParts[ 3 ] || ( jQuery.cssNumber[ prop ] ? "" : "px" ),
