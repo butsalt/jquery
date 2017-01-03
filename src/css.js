@@ -281,8 +281,8 @@ jQuery.extend( {
 		}
 	},
 
-	// 该方法是一个强化后的css getter，包括兼容性处理，能尝试将value转化成Number
-	// 如果extra为真值，则会尝试将name对应的值转化为Number
+	// 该方法获取的是元素样式的实际值(computed style)
+	// 如果extra为真值，则会尝试将value转化为Number
 	css: function( elem, name, extra, styles ) {
 		var val, num, hooks,
 			origName = jQuery.camelCase( name );
