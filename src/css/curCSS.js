@@ -21,6 +21,7 @@ function curCSS( elem, name, computed ) {
 		ret = computed.getPropertyValue( name ) || computed[ name ];
 
 		if ( ret === "" && !jQuery.contains( elem.ownerDocument, elem ) ) {
+			// 获取computed style失败，转为获取当前正应用在元素上的css声明
 			ret = jQuery.style( elem, name );
 		}
 

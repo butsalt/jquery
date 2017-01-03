@@ -207,6 +207,7 @@ jQuery.extend( {
 		"float": "cssFloat"
 	},
 
+	// 
 	// Get and set the style property on a DOM Node
 	style: function( elem, name, value, extra ) {
 
