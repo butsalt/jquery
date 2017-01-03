@@ -43,6 +43,8 @@ var access = function( elems, fn, key, value, chainable, emptyGet, raw ) {
 			} else {
 				bulk = fn;
 				fn = function( elem, key, value ) {
+					// raw时，fn的scope用的elems应该是一个jquery对象
+					// 为了保证bulk时函数签名相同，在非raw时fn的scope也应该是一个jquery对象
 					return bulk.call( jQuery( elem ), value );
 				};
 			}
