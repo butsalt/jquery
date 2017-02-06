@@ -181,6 +181,8 @@ jQuery.Callbacks = function( options ) {
 			// Clear all callbacks and values
 			disable: function() {
 				locked = queue = [];
+				// list.length === 0
+				// 直接停止list的循环
 				list = memory = "";
 				return this;
 			},
@@ -192,8 +194,16 @@ jQuery.Callbacks = function( options ) {
 			// Also disable .add unless we have memory (since it would have no effect)
 			// Abort any pending executions
 			lock: function() {
+				// locked仅仅是一个flag，当locked的值设成数组时在判断时就是真值
+				// queue中的每一项就是一次fire的参数列表
 				locked = queue = [];
+				// firing为真值时，说明list中的项正在循环，list的本轮循环仍需要正常完成
+				//     所以list不能设置为''，当前使用的参数列表memory也不能设置为''
+				// firing为假值memory为真值时，说明创建callbacks是声明需要memory的，且callbacks至少已经fire过一次
+				//     往后的add功能仍需要往list里push函数，所以list不能设置为''
+				//     memory要作为最后一次fire的参数，所以memory也不能设置为''
 				if ( !memory && !firing ) {
+					// list.length === 0，停止循环
 					list = memory = "";
 				}
 				return this;
