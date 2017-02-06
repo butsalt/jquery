@@ -54,6 +54,8 @@ jQuery.extend( {
 				// ... .then handlers, argument index, [final state]
 				[ "notify", "progress", jQuery.Callbacks( "memory" ),
 					jQuery.Callbacks( "memory" ), 2 ],
+				// resolve本身没有解析thenable的能力
+				// 调用resolve时如果传入一个thenable对象，那么thenable会被直接作为resolve的结果被使用
 				[ "resolve", "done", jQuery.Callbacks( "once memory" ),
 					jQuery.Callbacks( "once memory" ), 0, "resolved" ],
 				[ "reject", "fail", jQuery.Callbacks( "once memory" ),
