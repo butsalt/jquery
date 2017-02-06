@@ -149,7 +149,9 @@ jQuery.extend( {
 										if ( special ) {
 											then.call(
 												returned,
+												// 最终还是通过调用special来调用deferred.notifyWith
 												resolve( maxDepth, deferred, Identity, special ),
+												// 最终还是通过调用special来调用deferred.notifyWith
 												resolve( maxDepth, deferred, Thrower, special )
 											);
 
@@ -178,6 +180,7 @@ jQuery.extend( {
 
 										// Only substitute handlers pass on context
 										// and multiple values (non-spec behavior)
+										// Identity的入参相当于是出参，那么returned可以丢弃
 										if ( handler !== Identity ) {
 											that = undefined;
 											args = [ returned ];
@@ -185,6 +188,8 @@ jQuery.extend( {
 
 										// Process the value(s)
 										// Default process is resolve
+										// 存在special说明handler是onProgress
+										// 调用special相当于是调用deferred.notifyWith
 										( special || deferred.resolveWith )( that, args );
 									}
 								},
