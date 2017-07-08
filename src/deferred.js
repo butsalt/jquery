@@ -150,8 +150,11 @@ jQuery.extend( {
 											then.call(
 												returned,
 												// 最终还是通过调用special来调用deferred.notifyWith
+												// 也就是说，deferred的progress队列上的函数入参以resolved结果为准
 												resolve( maxDepth, deferred, Identity, special ),
-												// 最终还是通过调用special来调用deferred.notifyWith
+												// 这里虽然在thenable注册了当决议结果为rejected时的回调
+												// 但由于handler是Thrower，又因为存在special不会catch
+												// 所以如果决议结果是rejected，那么接下来就不能再用异常进行notify了，而是抛异常
 												resolve( maxDepth, deferred, Thrower, special )
 											);
 
@@ -190,6 +193,7 @@ jQuery.extend( {
 										// Default process is resolve
 										// 存在special说明handler是onProgress
 										// 调用special相当于是调用deferred.notifyWith
+										// 注册在deferred的progress队列上的函数入参以handler返回的结果为准
 										( special || deferred.resolveWith )( that, args );
 									}
 								},
@@ -211,6 +215,8 @@ jQuery.extend( {
 											// https://promisesaplus.com/#point-61
 											// Ignore post-resolution exceptions
 											if ( depth + 1 >= maxDepth ) {
+												// depth + 1 > maxDepth 发生在调用handler时抛异常的场合
+												// depth + 1 = maxDepth 发生在调用handler时返回thenable，但使用thenable.then注册时抛异常的场合
 
 												// Only substitute handlers pass on context
 												// and multiple values (non-spec behavior)
