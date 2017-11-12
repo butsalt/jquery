@@ -64,6 +64,8 @@ function addToPrefiltersOrTransports( structure ) {
 
 		var dataType,
 			i = 0,
+			// dataTypeExpression可以由多个dataType构成，之前用空格分隔
+			// 代表这个filter/transport要应用于多个dataTtype
 			dataTypes = dataTypeExpression.toLowerCase().match( rnotwhite ) || [];
 
 		if ( jQuery.isFunction( func ) ) {
@@ -93,13 +95,17 @@ function inspectPrefiltersOrTransports( structure, options, originalOptions, jqX
 
 	function inspect( dataType ) {
 		var selected;
+		// 防止dataType对应的filter/transport被重复执行
 		inspected[ dataType ] = true;
 		jQuery.each( structure[ dataType ] || [], function( _, prefilterOrFactory ) {
 			var dataTypeOrTransport = prefilterOrFactory( options, originalOptions, jqXHR );
 			if ( typeof dataTypeOrTransport === "string" &&
 				!seekingTransport && !inspected[ dataTypeOrTransport ] ) {
 
+				// 根据当前dataType应用的当前filter后返回值是一个string，代表新的dataType
+				// 将这个新的dataType压入options.dataTypes的首位
 				options.dataTypes.unshift( dataTypeOrTransport );
+				// 使用这个新的dataType再次尝试应用filter
 				inspect( dataTypeOrTransport );
 				return false;
 			} else if ( seekingTransport ) {
@@ -109,6 +115,8 @@ function inspectPrefiltersOrTransports( structure, options, originalOptions, jqX
 		return selected;
 	}
 
+	// 对于应用filter的逻辑，filter返回的新的dataType对应的filter，针对dataType申明的filter，'*'下的filter，都要被应用
+	// 对于查找transport的逻辑，如果真对dataType已经找到合适的transport就不再继续执行，否则查找'*'下的transport
 	return inspect( options.dataTypes[ 0 ] ) || !inspected[ "*" ] && inspect( "*" );
 }
 
@@ -145,12 +153,15 @@ function ajaxHandleResponses( s, jqXHR, responses ) {
 	while ( dataTypes[ 0 ] === "*" ) {
 		dataTypes.shift();
 		if ( ct === undefined ) {
+			// 没有精确的dataType，使用ct猜测dataType
+			// 优先使用option中的mimeType作为ct，否则使用response中的ContentType消息头作为ct
 			ct = s.mimeType || jqXHR.getResponseHeader( "Content-Type" );
 		}
 	}
 
 	// Check if we're dealing with a known content-type
 	if ( ct ) {
+		// 使用ct猜测dataType
 		for ( type in contents ) {
 			if ( contents[ type ] && contents[ type ].test( ct ) ) {
 				dataTypes.unshift( type );
@@ -167,6 +178,11 @@ function ajaxHandleResponses( s, jqXHR, responses ) {
 		// Try convertible dataTypes
 		for ( type in responses ) {
 			if ( !dataTypes[ 0 ] || s.converters[ type + " " + dataTypes[ 0 ] ] ) {
+				// 如果dataTypes中一个都没有 (一开始的dataypes为默认的['*']，'*'在处理过程中已被移除)
+				// 就使用当前遍历到的type作为finalDataType
+
+				// 否则，如果type -> dataTypes[0]的converter存在
+				// 就使用当前遍历到的type作为finalDataType
 				finalDataType = type;
 				break;
 			}
@@ -176,6 +192,7 @@ function ajaxHandleResponses( s, jqXHR, responses ) {
 		}
 
 		// Or just use first one
+		// 循环了response中所有的type还是一个合适的都没有，只能用遍历到的第一个dataType作为finalDataType
 		finalDataType = finalDataType || firstDataType;
 	}
 
@@ -203,6 +220,9 @@ function ajaxConvert( s, response, jqXHR, isSuccess ) {
 	// Create converters map with lowercased keys
 	if ( dataTypes[ 1 ] ) {
 		for ( conv in s.converters ) {
+			// conv描述的是一个dataType到另一个dataType的关键字
+			// 如'text json'，即text -> json
+			// converters[conv]是一个用于转换的function
 			converters[ conv.toLowerCase() ] = s.converters[ conv ];
 		}
 	}
@@ -583,21 +603,25 @@ jQuery.extend( {
 		s.type = s.type.toUpperCase();
 
 		// Determine if request has content
+		// 如果method为GET或HEAD，则没有消息实体
 		s.hasContent = !rnoContent.test( s.type );
 
 		// Save the URL in case we're toying with the If-Modified-Since
 		// and/or If-None-Match header later on
 		// Remove hash to simplify url manipulation
+		// 去除末尾从'#'开始的部分
 		cacheURL = s.url.replace( rhash, "" );
 
 		// More options handling for requests with no content
 		if ( !s.hasContent ) {
 
 			// Remember the hash so we can put it back
+			// 末尾从'#'开始的部分
 			uncached = s.url.slice( cacheURL.length );
 
 			// If data is available, append data to url
 			if ( s.data ) {
+				// method为GET或HEAD，将data放到请求链接中
 				cacheURL += ( rquery.test( cacheURL ) ? "&" : "?" ) + s.data;
 
 				// #9682: remove data so that it's not used in an eventual retry
@@ -606,7 +630,10 @@ jQuery.extend( {
 
 			// Add or update anti-cache param if needed
 			if ( s.cache === false ) {
+				// 为了防止cache，增加一个_=xxx的请求参数
+				// 将请求中_=xxx去除
 				cacheURL = cacheURL.replace( rantiCache, "$1" );
+				// 添加一个不重复的_=xxx
 				uncached = ( rquery.test( cacheURL ) ? "&" : "?" ) + "_=" + ( nonce++ ) + uncached;
 			}
 
@@ -737,6 +764,7 @@ jQuery.extend( {
 
 			// Get response data
 			if ( responses ) {
+				// 获取真正准备处理的resnponse
 				response = ajaxHandleResponses( s, jqXHR, responses );
 			}
 
