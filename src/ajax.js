@@ -107,8 +107,10 @@ function inspectPrefiltersOrTransports( structure, options, originalOptions, jqX
 				options.dataTypes.unshift( dataTypeOrTransport );
 				// 使用这个新的dataType再次尝试应用filter
 				inspect( dataTypeOrTransport );
+				// 当前dataType之后的所有filter都不再应用
 				return false;
 			} else if ( seekingTransport ) {
+				// 找到一个transport就不再找了
 				return !( selected = dataTypeOrTransport );
 			}
 		} );
