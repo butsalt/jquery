@@ -257,6 +257,9 @@ function propFilter( props, specialEasing ) {
 		easing = specialEasing[ name ];
 		value = props[ index ];
 		if ( jQuery.isArray( value ) ) {
+			// value是数组
+			// 下标0是动画结束时prop对应的期望值
+			// 下标1是prop使用的easing
 			easing = value[ 1 ];
 			value = props[ index ] = value[ 0 ];
 		}
@@ -335,6 +338,7 @@ function Animation( elem, properties, options ) {
 			duration: options.duration,
 			tweens: [],
 			createTween: function( prop, end ) {
+				// end是当动画结束后，prop对应的期望值
 				var tween = jQuery.Tween( elem, animation.opts, prop, end,
 						animation.opts.specialEasing[ prop ] || animation.opts.easing );
 				animation.tweens.push( tween );

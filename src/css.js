@@ -386,6 +386,9 @@ jQuery.each( {
 }, function( prefix, suffix ) {
 	jQuery.cssHooks[ prefix + suffix ] = {
 		expand: function( value ) {
+			// border-width: '1px 2px';
+			// ->
+			// borderTopWidth: 1px
 			var i = 0,
 				expanded = {},
 
