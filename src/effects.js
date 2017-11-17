@@ -370,8 +370,12 @@ function Animation( elem, properties, options ) {
 		} ),
 		props = animation.props;
 
+	// expand prop
+	// 如果prop的value通过数组的方式声明了specialEasing，
+	//   将specialEasing提取到animation.opts.value
 	propFilter( props, animation.opts.specialEasing );
 
+	// 应用所有prefilter
 	for ( ; index < length; index++ ) {
 		result = Animation.prefilters[ index ].call( animation, elem, props, animation.opts );
 		if ( result ) {
@@ -383,6 +387,7 @@ function Animation( elem, properties, options ) {
 		}
 	}
 
+	// 每一个prop创建一个tween
 	jQuery.map( props, createTween, animation );
 
 	if ( jQuery.isFunction( animation.opts.start ) ) {
